@@ -103,11 +103,11 @@ def getPage(id):
             print("no")
 
 
-def get_stores_info(page):
+def get_stores_info(page,keyword):
 
     global posts
     data = {
-        "inputtext": "nestle",
+        "inputtext": keyword,
         "page": page
     }
     response = requests.post("https://pantip.com/search/search/get_search", data=data)
@@ -123,11 +123,12 @@ def get_stores_info(page):
 
         bagOfWords = pickle_vector.transform([tokens])
         Test = bagOfWords.toarray()
-
+        print(loaded_model.predict_proba(Test))
         if loaded_model.predict(Test) == 0:
             bagOfWords2 = pickle_vector2.transform([tokens])
             Test2 = bagOfWords2.toarray()
 
+            print(loaded_model2.predict_proba(Test2))
             if loaded_model2.predict(Test2) == 1:
                 type1 = "pos"
             elif loaded_model2.predict(Test2) == 0:
@@ -137,7 +138,9 @@ def get_stores_info(page):
 
 
         else:
+
             type1 = "ques"
+
         posts.append({
             "tag":"title",
             "id":id,
