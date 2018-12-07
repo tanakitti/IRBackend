@@ -133,13 +133,14 @@ def get_stores_info(page, keyword):
 
             type1 = "ques"
 
-        posts.append({
-            "tag":"title",
-            "id": id,
-            "room":id,
-            "text":title,
-            "type":type1
-        })
+        if keyword.lower in title.lower():
+            posts.append({
+                "tag":"title",
+                "id": id,
+                "room":id,
+                "text":title,
+                "type":type1
+            })
 
         getPage(id)
         
