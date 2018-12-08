@@ -6,6 +6,7 @@ import numpy as np
 import sklearn
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.model_selection import StratifiedKFold
+import pickle
 np.set_printoptions(threshold=np.inf)
 pd.set_option('display.max_columns', 1700)
 
@@ -74,6 +75,7 @@ vectorizer = sklearn.feature_extraction.text.CountVectorizer(tokenizer=pythainlp
 
 cv = StratifiedKFold(n_splits=10,shuffle=True)
 
+save = 0
 for train_index, test_index in cv.split(resultDf['tokens'], resultDf['type']):
 
     X_train, X_test = resultDf['tokens'][train_index], resultDf['tokens'][test_index]
@@ -88,6 +90,16 @@ for train_index, test_index in cv.split(resultDf['tokens'], resultDf['type']):
     nb = MultinomialNB()
     nb.fit(X_train, y_train)
     print(nb.score(X_test, y_test))
+
+    if (save == 0):
+
+        vecterFileName = "./vec/senVec.plk"
+        pickle.dump(vectorize, open(vecterFileName, 'wb'))
+
+        filename = './model/senModel.sav'
+        pickle.dump(nb, open(filename, 'wb'))
+
+        save = 1
 
 
 

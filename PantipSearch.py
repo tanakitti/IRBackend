@@ -9,16 +9,16 @@ import pythainlp
 from pythainlp.sentiment import sentiment
 import json
 posts = []
-filename = "./clawler/model/qestion.sav"
+filename = "./clawler/model/qusModel.sav"
 loaded_model = pickle.load(open(filename, 'rb'))
-filename2 = "./clawler/model/sentiment.sav"
+filename2 = "./clawler/model/senModel.sav"
 loaded_model2 = pickle.load(open(filename2, 'rb'))
 
 vec_filename = "./clawler/vec/qesVec.pkl"
 with open(vec_filename, 'rb') as file:
     pickle_vector = pickle.load(file)
 
-vec_filename2 = "./clawler/vec/sentiment.pkl"
+vec_filename2 = "./clawler/vec/senVec.pkl"
 with open(vec_filename2, 'rb') as file2:
     pickle_vector2 = pickle.load(file2)
 

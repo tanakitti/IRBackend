@@ -4,6 +4,7 @@ import re
 import pandas as pd
 import numpy as np
 import sklearn
+import pickle
 from sklearn.model_selection import StratifiedKFold
 from sklearn.naive_bayes import MultinomialNB
 np.set_printoptions(threshold=np.inf)
@@ -64,6 +65,7 @@ print(df.shape[0])
 
 cv = StratifiedKFold(n_splits=10,shuffle=True)
 
+save = 0
 for train_index, test_index in cv.split(df['tokens'], df['type']):
 
     X_train, X_test = df['tokens'][train_index], df['tokens'][test_index]
@@ -80,3 +82,14 @@ for train_index, test_index in cv.split(df['tokens'], df['type']):
     nb = MultinomialNB()
     nb.fit(X_train, y_train)
     print(nb.score(X_test, y_test))
+
+    if(save == 0):
+
+        vecterFileName = "./vec/qusVec.plk"
+        pickle.dump(vectorize,open(vecterFileName, 'wb'))
+
+        filename = './model/qusModel.sav'
+        pickle.dump(nb, open(filename, 'wb'))
+
+        save = 1
+
