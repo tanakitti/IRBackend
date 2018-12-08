@@ -14,11 +14,11 @@ loaded_model = pickle.load(open(filename, 'rb'))
 filename2 = "./clawler/model/senModel.sav"
 loaded_model2 = pickle.load(open(filename2, 'rb'))
 
-vec_filename = "./clawler/vec/qesVec.pkl"
+vec_filename = "./clawler/vec/qusVec.plk"
 with open(vec_filename, 'rb') as file:
     pickle_vector = pickle.load(file)
 
-vec_filename2 = "./clawler/vec/senVec.pkl"
+vec_filename2 = "./clawler/vec/senVec.plk"
 with open(vec_filename2, 'rb') as file2:
     pickle_vector2 = pickle.load(file2)
 
@@ -128,7 +128,7 @@ def get_stores_info(page, keyword):
 
             type1 = "ques"
 
-        if keyword.lower in title.lower():
+        if keyword.lower() in title.lower():
             posts.append({
                 "tag":"title",
                 "id": id,
@@ -140,3 +140,6 @@ def get_stores_info(page, keyword):
         getPage(id)
         
     return posts
+
+
+print(get_stores_info(1,"nestle"))
