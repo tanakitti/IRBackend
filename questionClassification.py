@@ -30,7 +30,7 @@ def under_sample(df, label, low_label, high_label, size):
 
 
 def text_cleaner(text):
-    pattern = re.compile(r"[^\u0E00-\u0E7Fa-zA-Z1-9' ]|^'|'$|''")
+    pattern = re.compile(r"[^\u0E00-\u0E7Fa-zA-Z1-9]")
     replaced = re.sub(pattern, '', text)
     tokens = pythainlp.tokenize.word_tokenize(replaced, engine='newmm')
     tokens = [token.replace(' ', '') for token in tokens]
@@ -61,7 +61,6 @@ for i, row in tqdm.tqdm(df.iterrows()):
 
 df = pd.DataFrame(entry)
 print(df.shape[0])
-
 
 cv = StratifiedKFold(n_splits=10,shuffle=True)
 

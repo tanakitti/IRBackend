@@ -24,20 +24,15 @@ with open(vec_filename2, 'rb') as file2:
 
 
 def text_cleaner(text):
-    table = str.maketrans('', '', string.punctuation.replace('?', ''))
-    tmp = re.sub(r'\d+', '', text)
-    tmp = tmp.translate(table).lower()
-    return tmp
-
-
-def tokenizer(text):
-    tokens = pythainlp.tokenize.word_tokenize(text, engine='newmm')
+    pattern = re.compile(r"[^\u0E00-\u0E7Fa-zA-Z1-9' ]|^'|'$|''")
+    replaced = re.sub(pattern, '', text)
+    tokens = pythainlp.tokenize.word_tokenize(replaced, engine='newmm')
     tokens = [token.replace(' ', '') for token in tokens]
     tokens = list(filter(lambda token: token != '', tokens))
-    stringToken = ""
+    clean = ""
     for token in tokens:
-        stringToken += token+" "
-    return stringToken
+        clean+=token
+    return clean
 
 
 def cleanhtml(raw_html):
@@ -63,13 +58,13 @@ def getPage(id):
 
             type1 = ""
             cleaned_text = text_cleaner(comment['message'])
-            tokens = tokenizer(cleaned_text)
 
-            bagOfWords = pickle_vector.transform([tokens])
+
+            bagOfWords = pickle_vector.transform([cleaned_text])
             Test = bagOfWords.toarray()
 
             if loaded_model.predict(Test) == 0:
-                bagOfWords2 = pickle_vector2.transform([tokens])
+                bagOfWords2 = pickle_vector2.transform([cleaned_text])
                 Test2 = bagOfWords2.toarray()
 
                 if loaded_model2.predict(Test2) == 1:
@@ -112,13 +107,13 @@ def get_stores_info(page, keyword):
 
         type1 = ""
         cleaned_text = text_cleaner(title)
-        tokens = tokenizer(cleaned_text)
 
-        bagOfWords = pickle_vector.transform([tokens])
+
+        bagOfWords = pickle_vector.transform([cleaned_text])
         Test = bagOfWords.toarray()
         # print(loaded_model.predict_proba(Test))
         if loaded_model.predict(Test) == 0:
-            bagOfWords2 = pickle_vector2.transform([tokens])
+            bagOfWords2 = pickle_vector2.transform([cleaned_text])
             Test2 = bagOfWords2.toarray()
 
             # print(loaded_model2.predict_proba(Test2))
@@ -145,17 +140,3 @@ def get_stores_info(page, keyword):
         getPage(id)
         
     return posts
-
-
-# def main():
-
-#     i = 0
-    # while len(posts) < 20:
-    #     i += 1
-    #     time.sleep(1)
-    #     print(get_stores_info(i))
-    # print(posts)
-
-
-# if __name__ == '__main__':
-#     main()

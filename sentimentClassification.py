@@ -28,9 +28,15 @@ def under_sample(df, label, low_label, high_label, size):
     return df_under_sample
 
 def text_cleaner(text):
-    pattern = re.compile(r"[^\u0E00-\u0E7Fa-zA-Z' ]|^'|'$|''")
+    pattern = re.compile(r"[^\u0E00-\u0E7Fa-zA-Z1-9]")
     replaced = re.sub(pattern, '', text)
-    return replaced
+    tokens = pythainlp.tokenize.word_tokenize(replaced, engine='newmm')
+    tokens = [token.replace(' ', '') for token in tokens]
+    tokens = list(filter(lambda token: token != '', tokens))
+    clean = ""
+    for token in tokens:
+        clean+=token
+    return clean
 
 df = pd.read_csv('./corpus/sentiment/all.csv')
 
@@ -40,20 +46,15 @@ df = df.replace({0:-1})
 
 print(df.shape[0])
 
-df3 = pd.read_csv("./corpus/sentiment/IRresult.csv")
-df3 = df3.drop(['id','roomid'],axis=1)
-
-print(df3.shape[0])
-
-testText = []
-df2 = pd.read_csv("./corpus/sentiment/gadgetResult.csv")
-df2 = df2.drop(['id','roomid'],axis=1)
+df2 = pd.read_csv("./corpus/sentiment/pantip_tag.csv")
+df2 = df2.drop(['id'],axis=1)
 
 print(df2.shape[0])
 
-frames = [df,df3,df2]
+frames = [df,df2]
 resultDf = pd.concat(frames)
 
+print(resultDf.type.value_counts())
 
 
 
@@ -74,7 +75,7 @@ vectorizer = sklearn.feature_extraction.text.CountVectorizer(tokenizer=pythainlp
 cv = StratifiedKFold(n_splits=10,shuffle=True)
 
 for train_index, test_index in cv.split(resultDf['tokens'], resultDf['type']):
-    # print("TRAIN:", train_index, "\nTEST:", test_index)
+
     X_train, X_test = resultDf['tokens'][train_index], resultDf['tokens'][test_index]
     y_train, y_test = resultDf['type'][train_index], resultDf['type'][test_index]
     vectorize = sklearn.feature_extraction.text.CountVectorizer(tokenizer=pythainlp.tokenize.word_tokenize)
