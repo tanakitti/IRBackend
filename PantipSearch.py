@@ -8,6 +8,7 @@ import pickle
 import pythainlp
 from pythainlp.sentiment import sentiment
 import json
+
 posts = []
 filename = "./clawler/model/qusModel.sav"
 loaded_model = pickle.load(open(filename, 'rb'))
@@ -24,28 +25,26 @@ with open(vec_filename2, 'rb') as file2:
 
 
 def text_cleaner(text):
-    pattern = re.compile(r"[^\u0E00-\u0E7Fa-zA-Z1-9' ]|^'|'$|''")
+    pattern = re.compile(r"[^\u0E00-\u0E7Fa-zA-Z1-9]")
     replaced = re.sub(pattern, '', text)
     tokens = pythainlp.tokenize.word_tokenize(replaced, engine='newmm')
     tokens = [token.replace(' ', '') for token in tokens]
     tokens = list(filter(lambda token: token != '', tokens))
     clean = ""
     for token in tokens:
-        clean+=token
+        clean += token
     return clean
 
 
 def cleanhtml(raw_html):
-
     raw_html = raw_html.replace("</em>", "")
     raw_html = raw_html.replace("<em>", "")
     return raw_html
 
 
-def getPage(id):
-
+def getPage(id, keyword):
     comments = requests.get(
-        "https://pantip.com/forum/topic/render_comments?tid="+ id +"&type=3", 
+        "https://pantip.com/forum/topic/render_comments?tid=" + id + "&type=3",
         headers={"X-Requested-With": "XMLHttpRequest"}
     )
 
@@ -54,11 +53,10 @@ def getPage(id):
 
     if ("comments" in comments):
 
-        for comment in  comments['comments']:
+        for comment in comments['comments']:
 
             type1 = ""
             cleaned_text = text_cleaner(comment['message'])
-
 
             bagOfWords = pickle_vector.transform([cleaned_text])
             Test = bagOfWords.toarray()
@@ -77,19 +75,18 @@ def getPage(id):
             else:
                 type1 = "ques"
 
-
-
-            posts.append({
-                "tag": "comment",
-                "id": id,
-                "text": comment['message'],
-                "type": type1
-            })
-    
+            if comment['message'].strip() != "":
+                posts.append({
+                    "tag": "comment",
+                    "id": id,
+                    "text": comment['message'],
+                    "type": type1
+                })
+            else:
+                print("sad")
 
 
 def get_stores_info(page, keyword):
-
     global posts
     posts = []
 
@@ -107,7 +104,6 @@ def get_stores_info(page, keyword):
 
         type1 = ""
         cleaned_text = text_cleaner(title)
-
 
         bagOfWords = pickle_vector.transform([cleaned_text])
         Test = bagOfWords.toarray()
@@ -128,18 +124,17 @@ def get_stores_info(page, keyword):
 
             type1 = "ques"
 
-        if keyword.lower() in title.lower():
+        if title.strip() != "":
             posts.append({
-                "tag":"title",
+                "tag": "title",
                 "id": id,
-                "room":id,
-                "text":title,
-                "type":type1
+                "room": id,
+                "text": title,
+                "type": type1
             })
+        else:
+            print("sad")
 
-        getPage(id)
-        
+        getPage(id, keyword)
+
     return posts
-
-
-print(get_stores_info(1,"nestle"))
